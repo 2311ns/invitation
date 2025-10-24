@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>دعوة الدخول</title>
+  <style>
+    body {
+      font-family: "Tajawal", sans-serif;
+      text-align: center;
+      padding-top: 100px;
+      background-color: #fff8f8;
+    }
+    h1 {
+      color: #c2185b;
+      font-size: 28px;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="message"></h1>
+
+  <script>
+    // مفتاح لتخزين عدد الفتحات في المتصفح
+    const key = "invitation_uses";
+    let used = localStorage.getItem(key);
+    if (!used) used = 0;
+    used = parseInt(used);
+
+    if (used < 3) {
+      used++;
+      localStorage.setItem(key, used);
+      document.getElementById("message").textContent = "تم مسح الباركود ✅";
+    } else {
+      document.getElementById("message").textContent = "تم استخدام الباركود مسبقاً ❌";
+    }
+  </script>
+</body>
+</html>
