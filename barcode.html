@@ -1,41 +1,83 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>دعوة الدخول</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>باركود الدعوة</title>
   <style>
     body {
       font-family: "Tajawal", sans-serif;
       text-align: center;
-      padding-top: 100px;
-      background-color: #fff8f8;
+      background-color: #faf6f0;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .card {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
     h1 {
-      color: #c2185b;
-      font-size: 28px;
+      color: #b78c5c;
     }
   </style>
 </head>
 <body>
-  <h1 id="message"></h1>
+  <div class="card">
+    <h1 id="message">جاري التحقق من الباركود...</h1>
+  </div>
 
-  <script>
-    // مفتاح لتخزين عدد الفتحات في المتصفح
-    const key = "invitation_uses";
-    let used = localStorage.getItem(key);
-    if (!used) used = 0;
-    used = parseInt(used);
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
-    if (used < 3) {
-      used++;
-      localStorage.setItem(key, used);
-      document.getElementById("message").textContent = "تم مسح الباركود ✅";
-    } else {
-      document.getElementById("message").textContent = "تم استخدام الباركود مسبقاً ❌";
+    // إعدادات مشروعك
+    const firebaseConfig = {
+      apiKey: "AIzaSyCLfFxAj7Hcc_lRBYT32lMcc6CxAAyzyjU",
+      authDomain: "invitationqr-16d42.firebaseapp.com",
+      projectId: "invitationqr-16d42",
+      storageBucket: "invitationqr-16d42.firebasestorage.app",
+      messagingSenderId: "313477268667",
+      appId: "1:313477268667:web:9f993e0da1027dfedc559e",
+      measurementId: "G-J6WTEQQBPS"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function checkBarcode() {
+      const ref = doc(db, "access", "counter1");
+      const docSnap = await getDoc(ref);
+
+      if (!docSnap.exists()) {
+        await setDoc(ref, { count: 1 });
+        document.getElementById("message").innerText = "تم مسح الباركود ✅";
+      } else {
+        const data = docSnap.data();
+        let count = data.count;
+
+        if (count >= 3) {
+          document.getElementById("message").innerText = "تم استخدام الباركود مسبقًا ❌";
+        } else {
+          count++;
+          await updateDoc(ref, { count });
+          document.getElementById("message").innerText = "تم مسح الباركود ✅";
+        }
+      }
     }
+
+    checkBarcode();
   </script>
 </body>
 </html>
+
+
 
 
 
