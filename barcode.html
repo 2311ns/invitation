@@ -35,9 +35,8 @@
   <!-- Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
-    // إعدادات مشروعك
     const firebaseConfig = {
       apiKey: "AIzaSyCLfFxAj7Hcc_lRBYT32lMcc6CxAAyzyjU",
       authDomain: "invitationqr-16d42.firebaseapp.com",
@@ -52,23 +51,27 @@
     const db = getFirestore(app);
 
     async function checkBarcode() {
-      const ref = doc(db, "access", "counter1");
-      const docSnap = await getDoc(ref);
+      try {
+        const ref = doc(db, "access", "counter1");
+        const docSnap = await getDoc(ref);
 
-      if (!docSnap.exists()) {
-        await setDoc(ref, { count: 1 });
-        document.getElementById("message").innerText = "تم مسح الباركود ✅";
-      } else {
-        const data = docSnap.data();
-        let count = data.count;
+        if (!docSnap.exists()) {
+          document.getElementById("message").innerText = "❌ لم يتم العثور على البيانات، تأكد من الإعدادات";
+          return;
+        }
+
+        let count = docSnap.data().count;
 
         if (count >= 3) {
-          document.getElementById("message").innerText = "تم استخدام الباركود مسبقًا ❌";
+          document.getElementById("message").innerText = "❌ تم استخدام الباركود مسبقًا";
         } else {
           count++;
           await updateDoc(ref, { count });
-          document.getElementById("message").innerText = "تم مسح الباركود ✅";
+          document.getElementById("message").innerText = `✅ تم مسح الباركود للمرة رقم ${count}`;
         }
+      } catch (e) {
+        document.getElementById("message").innerText = "⚠️ حدث خطأ في الاتصال بالقاعدة";
+        console.error(e);
       }
     }
 
@@ -76,6 +79,8 @@
   </script>
 </body>
 </html>
+
+
 
 
 
